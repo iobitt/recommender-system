@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_15_102452) do
+ActiveRecord::Schema[7.0].define(version: 2023_04_15_111843) do
   create_table "accounts", force: :cascade do |t|
-    t.bigint "external_id"
-    t.text "shop"
-    t.text "token"
+    t.integer "external_id", null: false
+    t.text "shop", null: false
+    t.text "password", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_accounts_on_external_id", unique: true
   end
 
 end

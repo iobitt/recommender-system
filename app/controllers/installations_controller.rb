@@ -10,6 +10,14 @@ class InstallationsController < ApplicationController
   private
 
   def permitted_params
-    params.permit(:shop, :insales_id, :token).tap { _1[:external_id] = _1.delete(:insales_id) }
+    params.permit(:shop, :insales_id, :token).tap do |params|
+      params[:external_id] = params.delete(:insales_id)
+      token = params.delete(:token)
+      params[:password] = Digest::MD5.hexdigest(token + secret_key)
+    end
+  end
+
+  def secret_key
+    Rails.application.credentials.insales[:secret_key]
   end
 end
