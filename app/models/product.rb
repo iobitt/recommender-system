@@ -1,3 +1,3 @@
-class Category < ApplicationRecord
+class Product < ApplicationRecord
   validates :id, uniqueness: true
 end

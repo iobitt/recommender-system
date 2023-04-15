@@ -1,3 +1,3 @@
-class Category < ApplicationRecord
+class Variant < ApplicationRecord
   validates :id, uniqueness: true
 end
