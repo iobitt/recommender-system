@@ -1,4 +1,3 @@
-import implicit
 import numpy as np
 from datetime import datetime
 from scipy import sparse as sp
@@ -7,26 +6,24 @@ from lib.db import connection
 from lib.logger import Logger
 from lib.metrics import normalized_average_precision
 
-
-class FitAlsModelService:
+class BaseService:
     def __init__(self, account_id):
         self.account_id = account_id
         self.cursor = connection.cursor()
 
     def call(self):
         Logger.info('Create matrix', *self.tags)
-        maxrix = self.create_matrix()
-
-        params = { 'factors': 16, 'regularization': 0.0, 'iterations': 8 }
-        Logger.info('Fit ALS model', *self.tags, **params)
-        model = implicit.als.AlternatingLeastSquares(**params)
-        model.fit(maxrix)
+        matrix = self.create_matrix()
+        model = self.fit(matrix)
 
         Logger.info('Calculate metrics', *self.tags)
         mapk = self.calculate_metrics(model)
-        Logger.info(f'MAP@K metric for fited ALS model is {mapk}', *self.tags)
+        Logger.info(f'MAP@K metric for fited I2I model is {mapk}', *self.tags)
 
         return [model, mapk]
+
+    def fit(sparse_matrix):
+        pass
 
     def create_matrix(self):
         period_start = datetime.strptime(self.cursor.execute('SELECT MIN(transaction_created_at) FROM orders WHERE account_id = ?', str(self.account_id)).fetchone()[0], '%Y-%m-%d %H:%M:%S')
@@ -47,7 +44,7 @@ class FitAlsModelService:
         for client_index, client_id in enumerate(self.client_ids):
             self.client_id_to_index[client_id] = client_index
             rows.append(self.make_coo_row(client_id))
-        return sp.vstack(rows).tocsr()
+        return sp.vstack(rows)
 
     def calculate_metrics(self, model):
         m_ap = []
@@ -73,7 +70,11 @@ class FitAlsModelService:
         for client_product_id in client_product_ids:
             product_index = self.product_id_to_index[client_product_id]
             client_row[product_index] = 1
-        return sp.coo_matrix(client_row)
+        return sp.coo_matrix(np.array(client_row).astype(np.float32))
+
+    @property
+    def logger(self):
+        Logger
 
     @property
     def tags(self):
