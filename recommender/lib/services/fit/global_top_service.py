@@ -6,7 +6,7 @@ from lib.services.fit.base_service import BaseService
 from lib.metrics import normalized_average_precision
 
 class GlobalTopService(BaseService):
-    def call(self):
+    def perform(self):
         sql = "SELECT product_id FROM orders JOIN order_lines ON order_lines.order_id = orders.id WHERE orders.account_id = ? GROUP BY product_id ORDER BY COUNT(*) DESC"
         top_products = self.cursor.execute(sql, str(self.account_id)).fetchall()
         top_products = list(map(lambda x: x[0], top_products))

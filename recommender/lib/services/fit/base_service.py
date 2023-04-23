@@ -5,13 +5,14 @@ from scipy import sparse as sp
 from lib.db import connection
 from lib.logger import Logger
 from lib.metrics import normalized_average_precision
+from lib.services.application_service import ApplicationService
 
-class BaseService:
+class BaseService(ApplicationService):
     def __init__(self, account_id):
         self.account_id = account_id
         self.cursor = connection.cursor()
 
-    def call(self):
+    def perform(self):
         Logger.info('Create matrix', *self.tags)
         matrix = self.create_matrix()
         model = self.fit(matrix)

@@ -1,6 +1,8 @@
 import json
 from redis import Redis
 
+from lib.services.generate_model_service import GenerateModelService
+
 QUEUE_NAME = 'queue:create_recommender_model'
 TIMEOUT = 3
 
