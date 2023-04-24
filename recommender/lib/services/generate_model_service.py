@@ -1,9 +1,11 @@
 from lib.logger import Logger
-from lib.services.fit.als_service import AlsService
 from lib.services.application_service import ApplicationService
-from lib.services.fit.global_top_service import GlobalTopService
-from lib.services.fit.item_to_item_service import ItemToItemService
-from lib.services.fit.user_to_user_service import UserToUserService
+from lib.services.fit.als_service import AlsService as FitAlsService
+from lib.services.save.als_service import AlsService as SaveAlsService
+from lib.services.fit.global_top_service import GlobalTopService as FitGlobalTopService
+from lib.services.save.global_top_service import GlobalTopService as SaveGlobalTopService
+from lib.services.fit.item_to_item_service import ItemToItemService as FitItemToItemService
+from lib.services.fit.user_to_user_service import UserToUserService as FitUserToUserService
 
 
 class GenerateModelService(ApplicationService):
@@ -11,24 +13,26 @@ class GenerateModelService(ApplicationService):
         self.account_id = account_id
 
     def perform(self):
-        services = {
-            'global_top': { 'class': GlobalTopService },
-            'als': { 'class': AlsService },
-            'i2i': { 'class': ItemToItemService },
-            'u2u': { 'class': UserToUserService }
+        models = {
+            'global_top': { 'fit_service': FitGlobalTopService, 'save_service': SaveGlobalTopService },
+            # 'als': { 'fit_service': FitAlsService, 'save_service': SaveAlsService },
+            # 'i2i': { 'fit_service': ItemToItemService },
+            # 'u2u': { 'fit_service': UserToUserService }
         }
 
         model_name = None
         max_metric_value = 0
-        for name in services:
-            service = services[name]
-            model, mapk = service['class'].call(self.account_id)
+        for name in models:
+            service = models[name]
+            model, mapk = service['fit_service'].call(self.account_id)
             service['model'] = model
-            service['mapk'] = mapk
+            service['score'] = mapk
             if mapk > max_metric_value:
                 model_name = name
                 max_metric_value = mapk
-        Logger.info(f"Favorite model is {model_name}. Metric is {max_metric_value}", *tags)
+        Logger.info(f"Favorite model is {model_name}. Metric is {max_metric_value}", *self.tags)
+        model = models[model_name]
+        model['save_service'].call(self.account_id, model['model'], model['score'])
 
     @property
     def tags(self):

@@ -1,2 +1,6 @@
+/__pycache__/
 /lib/services/__pycache__
 /lib/services/fit/__pycache__
+/lib/services/save/__pycache__
+/lib/services/load/__pycache__
+/lib/services/predict/__pycache__
