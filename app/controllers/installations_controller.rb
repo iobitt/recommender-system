@@ -7,6 +7,10 @@ class InstallationsController < ApplicationController
     head :ok
   end
 
+  def enter
+    redirect_to account_path(Account.find_by!(external_id: params[:insales_id]))
+  end
+
   private
 
   def permitted_params

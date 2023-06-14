@@ -19,7 +19,7 @@ class BaseService(ApplicationService):
 
         Logger.info('Calculate metrics', *self.tags)
         mapk = self.calculate_metrics(model)
-        Logger.info(f'MAP@K metric for fited I2I model is {mapk}', *self.tags)
+        Logger.info(f'MAP@K metric for fited model is {mapk}', *self.tags)
 
         return [model, mapk]
 

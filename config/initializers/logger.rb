@@ -7,7 +7,7 @@ color_by_severite = {
   DEBUG: :magenta
 }
 
-logger = Logger.new(STDOUT)
+logger = ActiveSupport::Logger.new(STDOUT)
 formatter = Logger::Formatter.new
 logger.formatter = proc do |severity, datetime, progname, msg|
   color = color_by_severite[severity.to_sym] || :white

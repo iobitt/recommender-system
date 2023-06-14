@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  resources :accounts do
+    member do
+      post :start_train
+    end
+  end
+
   resources :order_lines
   resources :orders
   resources :variants
@@ -11,6 +17,7 @@ Rails.application.routes.draw do
   resources :installations, only: [] do
     collection do
       get :install
+      get :enter
     end
   end
 end

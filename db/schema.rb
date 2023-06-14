@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_15_193600) do
+ActiveRecord::Schema[7.0].define(version: 2023_04_16_102647) do
   create_table "accounts", force: :cascade do |t|
     t.integer "external_id", null: false
     t.text "shop", null: false
@@ -47,10 +47,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_15_193600) do
 
   create_table "orders", force: :cascade do |t|
     t.integer "account_id", null: false
-    t.bigint "client_id", null: false
+    t.integer "client_id", null: false
     t.decimal "total_price", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "transaction_created_at", null: false
     t.index ["account_id"], name: "index_orders_on_account_id"
   end
 

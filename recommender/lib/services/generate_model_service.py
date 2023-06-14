@@ -15,24 +15,27 @@ class GenerateModelService(ApplicationService):
     def perform(self):
         models = {
             'global_top': { 'fit_service': FitGlobalTopService, 'save_service': SaveGlobalTopService },
-            # 'als': { 'fit_service': FitAlsService, 'save_service': SaveAlsService },
-            # 'i2i': { 'fit_service': ItemToItemService },
-            # 'u2u': { 'fit_service': UserToUserService }
+            'als': { 'fit_service': FitAlsService, 'save_service': SaveAlsService },
+            'i2i': { 'fit_service': FitItemToItemService, 'save_service': SaveItemToItemService },
+            'u2u': { 'fit_service': FitUserToUserService, 'save_service': SaveUserToUserService }
         }
 
         model_name = None
         max_metric_value = 0
         for name in models:
             service = models[name]
-            model, mapk = service['fit_service'].call(self.account_id)
+            fit_service = service['fit_service'](self.account_id)
+            model, mapk = fit_service.perform()
             service['model'] = model
             service['score'] = mapk
+            service['product_ids'] = fit_service.product_ids
+            service['product_id_to_index'] = fit_service.product_id_to_index
             if mapk > max_metric_value:
                 model_name = name
                 max_metric_value = mapk
         Logger.info(f"Favorite model is {model_name}. Metric is {max_metric_value}", *self.tags)
-        model = models[model_name]
-        model['save_service'].call(self.account_id, model['model'], model['score'])
+        model_and_utils = models[model_name]
+        model_and_utils['save_service'].call(self.account_id, **model_and_utils)
 
     @property
     def tags(self):
